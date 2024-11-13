@@ -1,11 +1,12 @@
+from typing import Optional
 from dataclasses import dataclass
 
 
 @dataclass
 class Opportunity:
     opportunity_territory_name: str
-    parent_account_id: str
-    parent_account: str  # can be emptry str
+    parent_account_id: Optional[str]
+    parent_account: Optional[str]
     account_id: str
     account_name: str
     fiscal_period: str
@@ -21,64 +22,46 @@ class Opportunity:
     def from_dict(cls, data: dict) -> "Opportunity":
         return cls(
             opportunity_territory_name=data.get(
-                'Opportunity Territory Name', ''),
+                'Opportunity Territory Name'),
             parent_account_id=data.get(
                 'Parent Account ID', ''),
             parent_account=data.get(
                 'Parent Account', ''),
             account_id=data.get(
-                'Account ID', ''),
+                'Account ID'),
             account_name=data.get(
-                'Account Name', ''),
+                'Account Name'),
             fiscal_period=data.get(
-                'Fiscal Period', ''),
+                'Fiscal Period'),
             opportunity_id=data.get(
-                'Opportunity ID', ''),
+                'Opportunity ID'),
             opportunity_name=data.get(
-                'Opportunity Name', ''),
+                'Opportunity Name'),
             opportunity_owner=data.get(
-                'Opportunity Owner', ''),
+                'Opportunity Owner'),
             close_date=data.get(
-                'Close Date', ''),
+                'Close Date'),
             stage=data.get(
-                'Stage', ''),
+                'Stage'),
             amount_converted=data.get(
-                'Amount (converted)', ''),
+                'Amount (converted)'),
             acv_opportunity_converted=data.get(
-                'ACV Opportunity (converted)', '')
+                'ACV Opportunity (converted)')
         )
 
     def __post_init__(self):
-        def validate_not_empty_or_invalid(attribute_name, value):
-            invalid_values = ["", " ", "-", " - "]
-            if value in invalid_values:
-                raise ValueError(
-                    f"The attribute '{attribute_name}' is invalid.")
-
-        # Validate specific attributes
-        validate_not_empty_or_invalid(
-            "opportunity_territory_name", self.opportunity_territory_name)
-        validate_not_empty_or_invalid(
-            "account_id", self.account_id)
-        validate_not_empty_or_invalid(
-            "opportunity_id", self.opportunity_id)
-        validate_not_empty_or_invalid(
-            "opportunity_name", self.opportunity_name)
-        validate_not_empty_or_invalid(
-            "opportunity_owner", self.opportunity_owner)
-        validate_not_empty_or_invalid(
-            "close_date", self.close_date)
-        validate_not_empty_or_invalid(
-            "stage", self.stage)
-        validate_not_empty_or_invalid(
-            "amount_converted", self.amount_converted)
-        validate_not_empty_or_invalid(
-            "acv_opportunity_converted", self.acv_opportunity_converted)
+        # Loop through all fields in the dataclass
+        for field_name, field_value in self.__dict__.items():
+            # Check the type hint of the field
+            field_type = self.__annotations__[field_name]
+            # If the field is not Optional and is None, raise an error
+            if field_value is None and not (field_type is Optional[str]):
+                raise ValueError(f"The field '{field_name}' cannot be None because it is not optional.")
 
     def __str__(self):
         return (
             f"--------------------\n"
-            f"Opportunity Details:\n"
+            f"Opportunity:\n"
             f"  Territory: {self.opportunity_territory_name}\n"
             f"  Account: {self.account_name} (ID: {self.account_id})\n"
             f"  Parent Account: {self.parent_account} (ID: {self.parent_account_id})\n"
